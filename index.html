@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OSINT Club — Open Source Intelligence Collective</title>
+  <meta name="description" content="OSINT Club — workshops, projects and resources for open-source intelligence practitioners." />
+  <meta name="theme-color" content="#0f1724" />
+  <style>
+    /* -------------------------
+       Reset + Base
+       ------------------------- */
+    :root{
+      --bg:#0b1220;               /* deep navy */
+      --card:#0f1724;
+      --muted:#95a0b3;
+      --glass: rgba(255,255,255,0.03);
+      --accent:#00e5a8;           /* neon green */
+      --accent-2:#46a0ff;         /* neon blue */
+      --danger:#ff6b6b;
+      --radius:14px;
+      --maxw:1100px;
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(800px 400px at 10% 10%, rgba(70,160,255,0.06), transparent 6%),
+        radial-gradient(600px 300px at 90% 90%, rgba(0,229,168,0.04), transparent 6%),
+        var(--bg);
+      color:#e9f0ff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+      padding:32px 20px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      gap:24px;
+      font-size:16px;
+    }
+
+    .container{
+      width:100%;
+      max-width:var(--maxw);
+    }
+
+    header{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:22px;
+    }
+
+    /* Brand */
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:56px;
+      height:56px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      box-shadow:0 4px 28px rgba(70,160,255,0.06), inset 0 -6px 18px rgba(0,0,0,0.25);
+      flex:0 0 56px;
+    }
+    .logo svg{filter:drop-shadow(0 6px 18px rgba(0,0,0,0.6))}
+
+    .title{
+      line-height:1;
+    }
+    .title h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:0.3px;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    nav{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .navbtn{
+      background:transparent;
+      color:var(--muted);
+      border:1px solid transparent;
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .navbtn:hover{color:var(--accent); transform:translateY(-1px)}
+    .cta{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#021018;
+      padding:9px 14px;
+      border-radius:12px;
+      font-weight:700;
+      box-shadow:0 8px 30px rgba(0,0,0,0.5);
+      border:none;
+      cursor:pointer;
+    }
+
+    /* Layout columns */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:20px;
+      align-items:start;
+    }
+
+    main{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border-radius:var(--radius);
+      padding:20px;
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow:0 8px 30px rgba(2,6,23,0.6);
+    }
+
+    aside{
+      position:sticky;
+      top:32px;
+      align-self:start;
+      background:var(--card);
+      border-radius:12px;
+      padding:16px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* Hero */
+    .hero{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+    .hero-left{
+      flex:1;
+    }
+    .kicker{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      background:linear-gradient(90deg, rgba(0,229,168,0.08), rgba(70,160,255,0.06));
+      color:var(--accent);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:13px;
+      width:fit-content;
+    }
+    .hero h2{
+      margin:10px 0 6px;
+      font-size:22px;
+    }
+    .lead{
+      color:var(--muted);
+      margin:0 0 10px;
+    }
+
+    /* Search + filters */
+    .controls{
+      display:flex;
+      gap:10px;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+    }
+    .search{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:10px 12px;
+      background:var(--glass);
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);
+      flex:1;
+      min-width:200px;
+    }
+    .search input{
+      background:transparent;border:0;color:inherit;outline:none;width:100%;
+    }
+    .filter{
+      padding:10px 12px;
+      border-radius:12px;
+      background:transparent;
+      border:1px dashed rgba(255,255,255,0.03);
+      color:var(--muted);
+      cursor:pointer;
+    }
+    .filter.active{border:1px solid rgba(70,160,255,0.12); color:var(--accent-2)}
+
+    /* Cards */
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      border-radius:12px;
+      padding:14px;
+      margin-bottom:12px;
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow:0 6px 20px rgba(2,6,23,0.6);
+    }
+    .card h3{margin:0 0 8px}
+    .muted{color:var(--muted);font-size:14px}
+
+    /* Events */
+    .events{
+      display:grid;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .event{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .evdate{
+      min-width:72px;
+      text-align:center;
+      padding:8px 10px;
+      border-radius:10px;
+      background:linear-gradient(180deg, rgba(70,160,255,0.06), rgba(0,229,168,0.03));
+      color:var(--accent-2);
+      font-weight:700;
+    }
+    .evbody{flex:1;}
+    .evbody h4{margin:0 0 6px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .tag{
+      background:rgba(255,255,255,0.02);
+      padding:6px 8px;border-radius:999px;font-size:13px;color:var(--muted);
+      border:1px solid rgba(255,255,255,0.02);
+    }
+
+    /* Resource list */
+    .resources-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap:12px;
+    }
+    .resource{
+      padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .resource h5{margin:0 0 6px;font-size:15px}
+    .resmeta{font-size:13px;color:var(--muted)}
+
+    /* Members carousel */
+    .carousel{
+      display:flex;
+      gap:12px;
+      overflow:hidden;
+      align-items:center;
+    }
+    .member{
+      min-width:220px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);
+    }
+    .avatar{
+      width:64px;height:64px;border-radius:12px;display:inline-grid;place-items:center;background:linear-gradient(135deg,var(--accent-2),var(--accent));
+      color:#021018;font-weight:800;font-size:20px;margin-right:10px;
+    }
+
+    /* Toolkit */
+    .toolgrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+      gap:10px;
+    }
+    .tool{
+      padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(0,0,0,0.12), transparent);
+      display:flex;flex-direction:column;gap:8px;border:1px solid rgba(255,255,255,0.03);
+    }
+    .copybtn{
+      background:transparent;border:1px dashed rgba(255,255,255,0.03);padding:8px;border-radius:8px;color:var(--muted);cursor:pointer;
+    }
+    .copybtn.copied{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#021018;border:none}
+
+    /* Footer */
+    footer{
+      margin-top:22px;color:var(--muted);font-size:14px;text-align:center;
+    }
+
+    /* Aside widgets */
+    .small{
+      font-size:14px;color:var(--muted)
+    }
+    .subscribe{
+      display:flex;gap:8px;margin-top:10px;
+    }
+    .subscribe input{
+      flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;
+    }
+    .btn{
+      padding:10px 12px;border-radius:10px;border:none;background:var(--accent);color:#021018;font-weight:700;cursor:pointer;
+    }
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed;inset:0;display:none;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));z-index:60;
+      align-items:center;justify-content:center;padding:24px;
+    }
+    .modal{
+      width:100%;max-width:760px;background:var(--card);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* Responsive */
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr; }
+      aside{position:static}
+      .logo{width:48px;height:48px}
+    }
+
+    /* Focus */
+    :focus{outline:3px solid rgba(70,160,255,0.12);outline-offset:3px}
+
+    /* tiny helpers */
+    .row{display:flex;gap:12px;align-items:center}
+    .spacer{flex:1}
+    .muted-2{color:rgba(255,255,255,0.06)}
+    .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <!-- Minimal 'eye' OSINT logo -->
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4C7 4 3.3 7.1 1.5 11.5 3.3 15.9 7 19 12 19s8.7-3.1 10.5-7.5C20.7 7.1 17 4 12 4z" fill="#021018" opacity="0.08"/>
+            <path d="M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" fill="#021018" opacity="0.08"/>
+            <path d="M12 6.2c-4.1 0-7.5 2.8-9 6.1 1.5 3.3 4.9 6.1 9 6.1s7.5-2.8 9-6.1c-1.5-3.3-4.9-6.1-9-6.1zm0 2.3a3.2 3.2 0 110 6.4 3.2 3.2 0 010-6.4z" fill="#021018"/>
+            <circle cx="12" cy="12.5" r="2" fill="#021018"/>
+          </svg>
+        </div>
+        <div class="title">
+          <h1>OSINT Club</h1>
+          <p>Open-source intelligence • Workshops • Projects</p>
+        </div>
+      </div>
+
+      <nav aria-label="Primary navigation">
+        <button class="navbtn" data-scroll="#about">About</button>
+        <button class="navbtn" data-scroll="#events">Events</button>
+        <button class="navbtn" data-scroll="#resources">Resources</button>
+        <button class="navbtn" data-scroll="#toolkit">Toolkit</button>
+        <button class="cta" id="joinBtn">Join</button>
+      </nav>
+    </header>
+
+    <section class="grid">
+      <main aria-labelledby="main-heading">
+        <section class="hero card">
+          <div class="hero-left">
+            <span class="kicker">Community • Research • Ethics</span>
+            <h2 id="main-heading">Welcome to the OSINT Club</h2>
+            <p class="lead">We teach best practices for investigative research using public sources — practical workshops, monthly challenges, and collaborative projects. Everyone from curious students to seasoned analysts is welcome.</p>
+            <div class="row controls" role="region" aria-label="search and filters">
+              <label class="search" for="global-search">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="opacity:.8"><path fill="currentColor" d="M21 20l-5.6-5.6A7.5 7.5 0 1019 13.4 7.5 7.5 0 0015.4 18L21 23.6z"></path></svg>
+                <input id="global-search" placeholder="Search events, resources, tools..." aria-label="Search" />
+              </label>
+
+              <button class="filter active" data-filter="all">All</button>
+              <button class="filter" data-filter="workshop">Workshops</button>
+              <button class="filter" data-filter="challenge">Challenges</button>
+              <button class="filter" data-filter="meetup">Meetups</button>
+              <div style="margin-left:auto" class="row">
+                <button id="ethicsBtn" class="navbtn" title="OSINT Ethics">Ethics ⚖️</button>
+                <button id="themeToggle" class="navbtn" title="Toggle theme">🌙</button>
+              </div>
+            </div>
+          </div>
+          <div class="hero-right" style="min-width:220px">
+            <div style="display:grid;gap:8px">
+              <div class="card small">
+                <strong>Next meetup</strong>
+                <div style="margin-top:8px">
+                  <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div><strong>Open Tools Night</strong><div class="muted">Sep 18, 2025 — Hybrid</div></div>
+                    <div class="pill">Register</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card small">
+                <strong>Monthly challenge</strong>
+                <div class="muted" style="margin-top:6px">Geo-locating practicum — Prizes for top 3</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="card" aria-labelledby="about-h">
+          <h3 id="about-h">About the club</h3>
+          <p class="muted">We meet weekly for talks, workshops, and hands-on sessions. Our focus areas include digital footprint analysis, geolocation, social media investigations, satellite imagery basics, and legal & ethical practices.</p>
+          <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">
+            <div style="flex:1;min-width:220px">
+              <strong>Who should join?</strong>
+              <p class="muted">Students, journalists, researchers, hobbyists, and professionals looking to improve OSINT skills in a responsible way.</p>
+            </div>
+            <div style="flex:1;min-width:220px">
+              <strong>What we do</strong>
+              <ul class="muted" style="margin:8px 0 0 18px">
+                <li>Hands-on workshops</li>
+                <li>Open challenges and capture-the-flag (CTF) events</li>
+                <li>Project teams (mapping, verification, archiving)</li>
+                <li>Tool demos and lightning talks</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Events -->
+        <section id="events" class="card" aria-labelledby="events-h">
+          <h3 id="events-h">Upcoming events</h3>
+
+          <div class="events" id="eventList" role="list">
+            <!-- Event items are produced by JS for interactivity (filter/search) -->
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="loadMore" class="navbtn">Load more</button>
+            <div class="muted" style="margin-left:auto">Can't find what you're looking for? <button id="requestEvent" class="navbtn">Request an event</button></div>
+          </div>
+        </section>
+
+        <!-- Resources -->
+        <section id="resources" class="card" aria-labelledby="resources-h">
+          <h3 id="resources-h">Curated resources</h3>
+          <p class="muted">A selection of guides, datasets, and tools to get started or deepen your practice.</p>
+          <div style="margin:10px 0">
+            <input id="res-filter" placeholder="Filter resources by keyword (ex: geolocation)" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" aria-label="filter resources" />
+          </div>
+
+          <div class="resources-grid" id="resourcesGrid">
+            <!-- Resource cards injected by JS -->
+          </div>
+        </section>
+
+        <!-- Toolkit -->
+        <section id="toolkit" class="card" aria-labelledby="toolkit-h">
+          <h3 id="toolkit-h">Practical toolkit</h3>
+          <p class="muted">Commands, scripts and recommended browser add-ons for investigations.</p>
+
+          <div class="toolgrid" id="toolGrid" role="list">
+            <!-- Tools injected by JS -->
+          </div>
+        </section>
+
+        <!-- Contact / Join -->
+        <section id="contact" class="card" aria-labelledby="contact-h">
+          <h3 id="contact-h">Get involved</h3>
+          <p class="muted">Join a project, propose a talk, or reach out for collaboration.</p>
+          <form id="joinForm" autocomplete="on">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <input name="fname" id="fname" placeholder="Full name" required style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" />
+              <input name="email" id="email" type="email" placeholder="Email" required style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" />
+            </div>
+            <div style="margin-top:10px">
+              <textarea id="message" name="message" rows="3" placeholder="How would you like to contribute?" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit"></textarea>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+              <button class="btn" type="submit">Send request</button>
+              <button type="button" id="saveLocal" class="navbtn">Save locally</button>
+              <div class="spacer"></div>
+              <div class="muted">We'll never share your contact details.</div>
+            </div>
+            <div id="joinStatus" class="muted" style="margin-top:8px;display:none"></div>
+          </form>
+        </section>
+
+        <!-- Members -->
+        <section class="card" aria-labelledby="members-h">
+          <h3 id="members-h">Members spotlight</h3>
+          <div class="carousel" id="memberCarousel" aria-live="polite">
+            <!-- members added by JS -->
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button id="prevMember" class="navbtn">◀</button>
+            <button id="nextMember" class="navbtn">▶</button>
+            <div class="spacer"></div>
+            <div class="muted">Nominate a member: <button id="nominate" class="navbtn">Nominate</button></div>
+          </div>
+        </section>
+
+        <footer>
+          <div class="muted">© <span id="year"></span> OSINT Club — Built for curious minds. • <button id="credits" class="navbtn">Credits & Code</button></div>
+        </footer>
+      </main>
+
+      <aside aria-labelledby="aside-h">
+        <h4 id="aside-h">Stay updated</h4>
+        <p class="small muted">Weekly newsletter with event reminders and top OSINT reads.</p>
+        <div class="subscribe" role="region" aria-label="subscribe">
+          <input id="newsletterEmail" placeholder="email@example.org" type="email" aria-label="Newsletter email"/>
+          <button id="subscribeBtn" class="btn">Subscribe</button>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="card small">
+          <strong>Quick links</strong>
+          <ul style="margin:8px 0 0 18px" class="muted">
+            <li><button class="navbtn" data-scroll="#resources">Resource library</button></li>
+            <li><button class="navbtn" data-scroll="#toolkit">Command snippets</button></li>
+            <li><button class="navbtn" data-scroll="#events">Upcoming events</button></li>
+          </ul>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="card small">
+          <strong>Code of conduct</strong>
+          <p class="muted" style="margin-top:6px">We expect ethical behavior, respect for privacy, and compliance with local laws. See our <button id="codeBtn" class="navbtn">full policy</button>.</p>
+        </div>
+
+      </aside>
+    </section>
+  </div>
+
+  <!-- Ethics modal (hidden initially) -->
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <h3>OSINT Club — Ethics & Responsible Use</h3>
+      <p class="muted">OSINT practices can uncover sensitive information. Club members must commit to responsible research: respect privacy, avoid doxxing or harassment, verify before publishing, and follow applicable laws and platform terms of service.</p>
+      <ul class="muted">
+        <li>Always consider harm before you publish.</li>
+        <li>Obtain consent where necessary for personal data.</li>
+        <li>Prioritize verification and multiple independent sources.</li>
+        <li>Report misuse and escalate to moderators when needed.</li>
+      </ul>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="closeModal" class="navbtn">Close</button>
+        <button id="agreeEthics" class="btn">I agree</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =======================================================
+   JS: Interactivity and data
+   - All data lives here so the site runs without backend
+   - You can replace arrays with dynamic fetches later
+   ======================================================= */
+
+/* ---------- Basic helpers ---------- */
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+const formatDate = d => {
+  const date = new Date(d);
+  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+};
+
+/* ---------- Mock data (customize me) ---------- */
+const EVENTS = [
+  { id:1, date:'2025-10-20', title:'Open Tools Night', type:'meetup', desc:'Hands-on demos of OSINT browser extensions and workflows.', tags:['tools','browser','hands-on'] },
+  { id:2, date:'2025-10-25', title:'Geolocation Bootcamp', type:'workshop', desc:'Learn satellite- and ground-level geolocation techniques.', tags:['geolocation','imagery'] },
+  { id:3, date:'2025-11-04', title:'Verification Methods', type:'workshop', desc:'Cross-platform verification, image forensics and metadata analysis.', tags:['verification','forensics'] },
+  { id:4, date:'2025-11-17', title:'Capture-the-Flag: OSINT CTF', type:'challenge', desc:'Compete to solve open-source intelligence puzzles for badges.', tags:['ctf','challenge'] },
+  { id:5, date:'2025-12-05', title:'Mapping & Data Viz', type:'workshop', desc:'Transform collected data into maps and visualizations.', tags:['mapping','gis'] }
+];
+
+const RESOURCES = [
+  { id:'r1', title:'Beginner OSINT Handbook', type:'Guide', meta:'PDF • 48 pages', url:'#' },
+  { id:'r2', title:'OpenStreetMap Essentials', type:'Guide', meta:'Online tutorial', url:'#' },
+  { id:'r3', title:'Image Forensics 101', type:'Article', meta:'Blog post', url:'#' },
+  { id:'r4', title:'Social Media Archiving Tools', type:'Tool list', meta:'Scripts & extensions', url:'#' },
+  { id:'r5', title:'Satellite Imagery Primer', type:'Guide', meta:'Interactive', url:'#' }
+];
+
+const TOOLS = [
+  { id:'t1', name:'OSINT-Cheat: IP Lookup', cmd:'whois example.com', desc:'Quick whois lookup example' },
+  { id:'t2', name:'EXIF pull', cmd:'exiftool image.jpg', desc:'Extract metadata from images' },
+  { id:'t3', name:'Reverse image', cmd:'Use Google/Tineye reverse image search', desc:'Use image search for verification' },
+  { id:'t4', name:'Geo-locate via shadows', cmd:'Calculate sun angle with suncalc', desc:'Geolocation technique (concept)' }
+];
+
+const MEMBERS = [
+  { name:'Asha R.', role:'Lead — Research', bio:'Specializes in geolocation and satellite imagery.' },
+  { name:'Rohit S.', role:'Workshops', bio:'Runs tools nights and beginner-friendly sessions.' },
+  { name:'Maya P.', role:'Verification', bio:'Verification lead — image and video forensics.' },
+  { name:'Carlos L.', role:'Data Viz', bio:'Mapping and visualizations for open projects.' }
+];
+
+/* ---------- Render helpers ---------- */
+
+function renderEvents(filter='all', query='') {
+  const list = $('#eventList');
+  list.innerHTML = '';
+  let filtered = EVENTS.slice();
+
+  // filter by type
+  if (filter && filter !== 'all') filtered = filtered.filter(e=>e.type === filter);
+
+  // search text
+  if (query && query.trim().length>0) {
+    const q = query.trim().toLowerCase();
+    filtered = filtered.filter(e => (e.title + ' ' + e.desc + ' ' + e.tags.join(' ')).toLowerCase().includes(q));
+  }
+
+  if (filtered.length === 0) {
+    const no = document.createElement('div');
+    no.className='card';
+    no.innerHTML = '<div class="muted">No events found for your filters. Try clearing filters or search terms.</div>';
+    list.appendChild(no);
+    return;
+  }
+
+  // sort by date
+  filtered.sort((a,b)=> new Date(a.date) - new Date(b.date));
+
+  filtered.forEach(ev => {
+    const item = document.createElement('div');
+    item.className='card event';
+    item.setAttribute('role','listitem');
+    item.innerHTML = `
+      <div class="evdate" aria-hidden="true">
+        <div style="font-size:14px">${new Date(ev.date).toLocaleString(undefined,{day:'2-digit'})}</div>
+        <div style="font-size:12px;color:var(--muted)">${new Date(ev.date).toLocaleString(undefined,{month:'short'})}</div>
+      </div>
+      <div class="evbody">
+        <h4>${ev.title}</h4>
+        <div class="muted">${formatDate(ev.date)} • ${ev.type.charAt(0).toUpperCase() + ev.type.slice(1)}</div>
+        <p class="muted" style="margin-top:8px">${ev.desc}</p>
+        <div class="tags">${ev.tags.map(t=>`<div class="tag" aria-hidden="true">${t}</div>`).join('')}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="navbtn" data-action="register" data-id="${ev.id}">Register</button>
+          <button class="navbtn" data-action="details" data-id="${ev.id}">Details</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function renderResources(filter='') {
+  const grid = $('#resourcesGrid');
+  grid.innerHTML='';
+  const q = (filter || '').trim().toLowerCase();
+
+  const results = RESOURCES.filter(r => {
+    if (!q) return true;
+    return (r.title + ' ' + r.type + ' ' + r.meta).toLowerCase().includes(q);
+  });
+
+  if (results.length === 0) {
+    grid.innerHTML = `<div class="muted card">No resources found.</div>`;
+    return;
+  }
+
+  results.forEach(r=>{
+    const el = document.createElement('div');
+    el.className='resource';
+    el.innerHTML = `<h5>${r.title}</h5><div class="resmeta">${r.type} • ${r.meta}</div><div style="margin-top:8px;display:flex;gap:8px"><a class="navbtn" href="${r.url}" aria-label="Open ${r.title}">Open</a><button class="navbtn" data-action="bookmark" data-id="${r.id}">Bookmark</button></div>`;
+    grid.appendChild(el);
+  });
+}
+
+function renderTools() {
+  const grid = $('#toolGrid');
+  grid.innerHTML='';
+  TOOLS.forEach(t=>{
+    const el = document.createElement('div');
+    el.className='tool';
+    el.innerHTML = `<strong>${t.name}</strong><div class="muted">${t.desc}</div><pre style="white-space:pre-wrap;background:transparent;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);margin:0">${escapeHtml(t.cmd)}</pre><div style="display:flex;gap:8px"><button class="copybtn" data-cmd="${encodeURIComponent(t.cmd)}">Copy</button><button class="navbtn" data-action="run" data-id="${t.id}">Run (local)</button></div>`;
+    grid.appendChild(el);
+  });
+}
+
+/* escape HTML for code */
+function escapeHtml(s){ return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+/* members */
+let memberIndex=0;
+function renderMembers() {
+  const div = $('#memberCarousel');
+  div.innerHTML='';
+  // show 2 members (wrap) — simple carousel
+  const visible = 2;
+  for (let i=0;i<visible;i++){
+    const idx = (memberIndex + i) % MEMBERS.length;
+    const m = MEMBERS[idx];
+    const el = document.createElement('div');
+    el.className='member';
+    el.innerHTML = `<div style="display:flex;align-items:center"><div class="avatar" aria-hidden="true">${getInitials(m.name)}</div><div><strong>${m.name}</strong><div class="muted">${m.role}</div></div></div><p class="muted" style="margin-top:8px">${m.bio}</p>`;
+    div.appendChild(el);
+  }
+}
+function getInitials(name){
+  return name.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+}
+
+/* ---------- UI wiring ---------- */
+document.addEventListener('DOMContentLoaded', ()=> {
+  // initial renders
+  renderEvents();
+  renderResources();
+  renderTools();
+  renderMembers();
+  $('#year').textContent = new Date().getFullYear();
+
+  // nav scroll buttons
+  $$('[data-scroll]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const target = document.querySelector(btn.dataset.scroll);
+      if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // filters
+  $$('.filter').forEach(f=>{
+    f.addEventListener('click', ()=>{
+      $$('.filter').forEach(x=>x.classList.remove('active'));
+      f.classList.add('active');
+      const filter = f.dataset.filter;
+      renderEvents(filter, $('#global-search').value);
+    });
+  });
+
+  // search
+  $('#global-search').addEventListener('input', e=>{
+    const filter = $$('.filter.active')[0]?.dataset.filter || 'all';
+    renderEvents(filter, e.target.value);
+  });
+
+  // events actions (delegate)
+  $('#eventList').addEventListener('click', e=>{
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const id = Number(btn.dataset.id);
+    const ev = EVENTS.find(x=>x.id===id);
+    if (action==='register') {
+      // For demo: open mailto with subject + body populated
+      const subject = encodeURIComponent(`Register: ${ev.title}`);
+      const body = encodeURIComponent(`Hi,\n\nI'd like to register for "${ev.title}" on ${formatDate(ev.date)}.\n\nThanks,\n[Your name]`);
+      window.location.href = `mailto:organizers@osintclub.org?subject=${subject}&body=${body}`;
+    } else if (action==='details') {
+      alert(`${ev.title}\\n\\n${ev.desc}\\n\\nDate: ${formatDate(ev.date)}`);
+    }
+  });
+
+  // resource filter
+  $('#res-filter').addEventListener('input', e=> renderResources(e.target.value));
+
+  // copy tool commands
+  document.body.addEventListener('click', e=>{
+    if (e.target.matches('.copybtn')) {
+      const cb = e.target;
+      const cmd = decodeURIComponent(cb.dataset.cmd || '');
+      navigator.clipboard?.writeText(cmd).then(()=>{
+        cb.classList.add('copied'); cb.textContent='Copied ✓';
+        setTimeout(()=>{ cb.classList.remove('copied'); cb.textContent='Copy'; }, 1400);
+      }).catch(()=>{ alert('Copy failed — your browser may block clipboard access.')});
+    }
+  });
+
+  // run (local) — just explanation modal
+  document.body.addEventListener('click', e=>{
+    if (e.target.matches('[data-action="run"]')) {
+      const id = e.target.dataset.id;
+      const t = TOOLS.find(x=>x.id===id);
+      alert('To run this command, open a terminal on your machine and use:\\n\\n' + t.cmd);
+    }
+    if (e.target.matches('[data-action="bookmark"]')) {
+      const id = e.target.dataset.id;
+      localStorage.setItem('bookmark:'+id, '1');
+      e.target.textContent='Bookmarked ✓';
+    }
+  });
+
+  // newsletter subscribe
+  $('#subscribeBtn').addEventListener('click', ()=>{
+    const em = $('#newsletterEmail').value.trim();
+    if (!validateEmail(em)) { alert('Please enter a valid email'); return; }
+    // store locally for demo
+    const list = JSON.parse(localStorage.getItem('newsletter')||'[]');
+    if (!list.includes(em)) list.push(em);
+    localStorage.setItem('newsletter', JSON.stringify(list));
+    $('#newsletterEmail').value='';
+    $('#subscribeBtn').textContent='Subscribed ✓';
+    setTimeout(()=>$('#subscribeBtn').textContent='Subscribe', 1400);
+  });
+
+  // join form
+  $('#joinForm').addEventListener('submit', (ev)=>{
+    ev.preventDefault();
+    const name = $('#fname').value.trim();
+    const email = $('#email').value.trim();
+    if (!name || !validateEmail(email)) {
+      $('#joinStatus').style.display='block';
+      $('#joinStatus').textContent='Please provide a valid name and email.';
+      return;
+    }
+    // simulate sending: save to localStorage and show status
+    const submissions = JSON.parse(localStorage.getItem('joinRequests')||'[]');
+    submissions.push({name, email, message: $('#message').value.trim(), at: new Date().toISOString()});
+    localStorage.setItem('joinRequests', JSON.stringify(submissions));
+    $('#joinStatus').style.display='block';
+    $('#joinStatus').textContent='Thanks! Your request was saved and the organizers will reach out.';
+    $('#joinForm').reset();
+  });
+
+  $('#saveLocal').addEventListener('click', ()=>{
+    const payload = {name:$('#fname').value,email:$('#email').value,message:$('#message').value, savedAt: new Date().toISOString()};
+    localStorage.setItem('joinDraft', JSON.stringify(payload));
+    $('#joinStatus').style.display='block';
+    $('#joinStatus').textContent='Saved locally. You can submit later.';
+  });
+
+  // load draft if available
+  const draft = localStorage.getItem('joinDraft');
+  if (draft) {
+    try {
+      const p = JSON.parse(draft);
+      $('#fname').value = p.name || '';
+      $('#email').value = p.email || '';
+      $('#message').value = p.message || '';
+    } catch(e){}
+  }
+
+  // member carousel controls
+  $('#nextMember').addEventListener('click', ()=> { memberIndex = (memberIndex + 1) % MEMBERS.length; renderMembers(); });
+  $('#prevMember').addEventListener('click', ()=> { memberIndex = (memberIndex - 1 + MEMBERS.length) % MEMBERS.length; renderMembers(); });
+
+  $('#nominate').addEventListener('click', ()=> {
+    const name = prompt('Nominate a member — enter full name:');
+    if (!name) return;
+    MEMBERS.push({name, role:'Member', bio:'Nominated by community.'});
+    renderMembers();
+    alert('Thanks — nomination saved.');
+  });
+
+  // modal ethics
+  $('#ethicsBtn').addEventListener('click', openModal);
+  $('#codeBtn').addEventListener('click', openModal);
+  $('#credits').addEventListener('click', () => alert('Built with ❤️ by OSINT Club — single-file demo. Customize freely.'));
+  $('#agreeEthics').addEventListener('click', () => { closeModal(); localStorage.setItem('agreedEthics', '1'); });
+  $('#closeModal').addEventListener('click', closeModal);
+  $('#modalBackdrop').addEventListener('click', (e)=>{ if (e.target === $('#modalBackdrop')) closeModal(); });
+
+  // theme toggle (basic)
+  $('#themeToggle').addEventListener('click', ()=> {
+    const body = document.body;
+    if (body.dataset.theme === 'light') {
+      body.dataset.theme = 'dark';
+      body.style.background = '';
+      $('#themeToggle').textContent='🌙';
+    } else {
+      body.dataset.theme = 'light';
+      body.style.background = 'linear-gradient(120deg,#f6f9ff,#eaf2ff)';
+      $('#themeToggle').textContent='☀️';
+    }
+  });
+
+  // Scroll to join when join button clicked
+  $('#joinBtn').addEventListener('click', ()=> document.querySelector('#contact').scrollIntoView({behavior:'smooth'}));
+
+  // load more: demo simply alerts
+  $('#loadMore').addEventListener('click', ()=> alert('For more events, sync with the organizers or check back later.'));
+
+});
+
+/* ---------- small utilities ---------- */
+function validateEmail(e){
+  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(e);
+}
+
+/* ---------- Modal handlers ---------- */
+function openModal(){
+  const modal = $('#modalBackdrop');
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+  // focus first button
+  $('#closeModal').focus();
+}
+function closeModal(){
+  const modal = $('#modalBackdrop');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+}
+
+/* =======================================================
+   Accessibility: keyboard shortcuts (small)
+   - "/" to focus search
+   - "n" go next member, "p" previous
+   ======================================================= */
+document.addEventListener('keydown', e=>{
+  if (e.key === '/') {
+    const s = $('#global-search');
+    if (s) { e.preventDefault(); s.focus(); }
+  }
+  if (e.key === 'n') { document.getElementById('nextMember')?.click(); }
+  if (e.key === 'p') { document.getElementById('prevMember')?.click(); }
+});
+</script>
+</body>
+</html>
